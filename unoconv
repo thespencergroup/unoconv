@@ -1070,6 +1070,18 @@ class Convertor:
             except AttributeError:
                 pass
 
+            ### Custom Spreadsheet Handling
+            phase = "custom-spreadsheet-handling"
+            if document.supportsService("com.sun.star.sheet.SpreadsheetDocument"):
+                pageStyles = document.getStyleFamilies().getByName('PageStyles')
+                for styleName in pageStyles.getElementNames():
+                    pageStyle = pageStyles.getByName(styleName)
+                    pageStyle.setPropertyValue("ScaleToPagesX", 1)
+                    pageStyle.setPropertyValue("PrintGrid", True)
+
+                for sheet in document.getSheets():
+                    sheet.setPrintAreas([])
+
             ### Export phase
             phase = "export"
 
