@@ -1203,6 +1203,9 @@ class Listener:
             else:
                 cmd = [office.binary, "--headless", "--invisible", "--nocrashreport", "--nodefault", "--nologo", "--nofirststartwizard", "--norestore", "--accept=%s" % op.connection]
 
+                if op.userProfile:
+                    cmd.append("-env:UserInstallation=file://" + op.userProfile)
+
             # The rationale for using subprocess.Popen is to be able to handle
             # a SIGTERM signal below and properly terminate the started office
             # process then. This makes it possible to put the command unoconv -l
@@ -1258,9 +1261,14 @@ def die(ret, msg=None):
             info(2, 'Trying to stop %s GUI listener.' % product.ooName)
             try:
                 if product.ooName != "LibreOffice" or product.ooSetupVersion <= 3.3:
-                    subprocess.Popen([office.binary, "-headless", "-invisible", "-nocrashreport", "-nodefault", "-nofirststartwizard", "-nologo", "-norestore", "-unaccept=%s" % op.connection], env=os.environ)
+                    cmd = [office.binary, "-headless", "-invisible", "-nocrashreport", "-nodefault", "-nofirststartwizard", "-nologo", "-norestore", "-unaccept=%s" % op.connection]
                 else:
-                    subprocess.Popen([office.binary, "--headless", "--invisible", "--nocrashreport", "--nodefault", "--nofirststartwizard", "--nologo", "--norestore", "--unaccept=%s" % op.connection], env=os.environ)
+                    cmd = [office.binary, "--headless", "--invisible", "--nocrashreport", "--nodefault", "--nofirststartwizard", "--nologo", "--norestore", "--unaccept=%s" % op.connection]
+
+                    if op.userProfile:
+                        cmd.append("-env:UserInstallation=file://" + op.userProfile)
+
+                subprocess.Popen(cmd, env=os.environ)
                 ooproc.wait()
                 info(2, '%s listener successfully disabled.' % product.ooName)
             except Exception as e:
